@@ -57,7 +57,7 @@ class App extends Component {
 
   onSearchSubmit(event) {
     const { searchTerm } = this.state;
-    this.fetchSearchTopStories(searchTerm);
+    this.fetchSearchTopStories(searchTerm, DEFAULT_PAGE);
     event.preventDefault();
   }
 
@@ -77,11 +77,10 @@ class App extends Component {
   render() {
     const {searchTerm, result} = this.state;
     const page = (result && result.page) || 0;
-
     return (
       <div className="page">
         <div className="interactions">
-          <Button onclick={() => this.fetchSearchTopStories(searchTerm, page + 1)}>
+          <Button onClick={() => this.fetchSearchTopStories(searchTerm, page + 1)}>
             More
           </Button>
           <Search 
