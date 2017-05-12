@@ -25,6 +25,8 @@ import {
   Table
 } from '../Table';
 
+
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -32,7 +34,8 @@ class App extends Component {
     this.state = {
       results: null,
       searchKey: '',
-      searchTerm: DEFAULT_QUERY
+      searchTerm: DEFAULT_QUERY,
+      isLoading: false
     };
 
     this.needsToSearchTopStories = this.needsToSearchTopStories.bind(this);
@@ -64,11 +67,14 @@ class App extends Component {
       results: { 
         ...results,
         [searchKey]: { hits: updatedHits, page }
-      } 
+      },
+      isLoading: false 
     });
   }
 
   fetchSearchTopStories(searchTerm, page) {
+    this.setState({ isLoading: true });
+    
     fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`)
       .then(response => response.json())
       .then(result => this.setSearchTopStories(result));
@@ -111,10 +117,22 @@ class App extends Component {
   }
 
   render() {
+
+    const Loading = () => {
+      <div>Loading</div>
+    }
+
+    const withLoading = (Component) => ({ isLoading, ...rest }) => {
+      isLoading ? <Loading /> : <Component { ...rest } />
+    }
+
+    const ButtonWithLoading = withLoading(SubmitButton);
+
     const {
       searchTerm, 
       results,
-      searchKey
+      searchKey,
+      isLoading
     } = this.state;
 
     const page = (
@@ -145,9 +163,11 @@ class App extends Component {
             onDismiss={this.onDismiss}
           /> 
           <div className="interactions">
-            <SubmitButton onClick={() => this.fetchSearchTopStories(searchKey, page + 1)}>
+            <ButtonWithLoading
+              isLoading={isLoading}
+              onClick={() => this.fetchSearchTopStories(searchKey, page + 1)}>
               More
-            </SubmitButton>
+            </ButtonWithLoading>
           </div>
       </div>
     );
@@ -155,5 +175,11 @@ class App extends Component {
 }
 
 export default App;
+
+export {
+  SubmitButton,
+  SearchTextBox,
+  Table
+}
 
 

@@ -44,8 +44,8 @@ const Table = ({ list, onDismiss}) =>
   </div>
 
 Table.PropTypes = {
-  list: PropTypes.node,
-  onDismiss: PropTypes.func
+  list: PropTypes.array.isRequired,
+  onDismiss: PropTypes.func.isRequired
 }
 
 export default Table;
