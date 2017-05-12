@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './index.css';
+
 import {
   DEFAULT_QUERY,
   DEFAULT_PAGE,
@@ -10,7 +11,19 @@ import {
   PARAM_SEARCH,
   PARAM_PAGE,
   PARAM_HPP
-} from '../../Constants/index.js';
+} from '../../Constants';
+
+import {
+  SubmitButton
+} from '../Button';
+
+import {
+  SearchTextBox
+} from '../Search';
+
+import {
+  Table
+} from '../Table';
 
 class App extends Component {
   constructor(props) {
@@ -119,93 +132,28 @@ class App extends Component {
     return (
       <div className="page">
         <div className="interactions">
-          <Search 
+          <SearchTextBox 
             value={searchTerm}
             onChange={this.onSearchChange}
             onSubmit={this.onSearchSubmit}
           >
             Search
-          </Search>
+          </SearchTextBox>
         </div>
           <Table 
             list={list}
             onDismiss={this.onDismiss}
           /> 
           <div className="interactions">
-            <Button onClick={() => this.fetchSearchTopStories(searchKey, page + 1)}>
+            <SubmitButton onClick={() => this.fetchSearchTopStories(searchKey, page + 1)}>
               More
-            </Button>
+            </SubmitButton>
           </div>
       </div>
     );
   }
 }
 
-const Search = ({
-  value, 
-  onChange, 
-  onSubmit,
-  children
-}) =>
-  <form onSubmit={onSubmit}>
-    <input
-      type='text'
-      value={value}
-      onChange={onChange} />
-    <button type="submit">
-      {children}
-    </button>
-  </form>
-
-const largeColumn = {
-  width: '40%'
-}
-const midColumn = {
-  width: '30%'
-}
-const smallColumn = {
-  width: '10%'
-}
-
-const Table = ({ list, onDismiss}) =>
-  <div className="table">
-    { list.map(item => 
-      <div key={item.objectID} className="table-row">
-
-        <span style={{largeColumn}}>
-          <a href={item.url}>{item.title}</a>
-        </span>
-
-        <span style={{midColumn}}>
-          {item.author}
-        </span>
-
-        <span style={{smallColumn}}>
-          {item.num_comments}
-        </span>
-
-        <span style={{smallColumn}}>
-          {item.points}
-        </span>
-
-        <span style={{smallColumn}}>
-          <Button onClick={() => onDismiss(item.objectID)}
-            className="button-inline"
-          >
-            Dismiss
-          </Button>
-        </span>
-      </div>
-    )}
-  </div>
-
-const Button = ({ onClick, className = '', children }) =>
-  <button 
-    onClick={onClick} 
-    className={className} 
-    type="button"
-    >  
-      {children}
-  </button>
-
 export default App;
+
+
