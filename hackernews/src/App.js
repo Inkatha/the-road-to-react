@@ -1,27 +1,16 @@
 import React, { Component } from 'react';
 import './App.css';
 
-  const list = [
-      {
-        title: 'React',
-        url: 'https://facebook.github.io/react',
-        author: 'Jordan Walke',
-        num_comments: 3,
-        points: 4,
-        objectID: 0
-      },
-      { 
-        title: 'Redux',
-        url: 'https://github.com/reactjs/redux',
-        author: 'Dan Abramov, Andrew Clark',
-        num_comments: 2,
-        points: 5,
-        objectID: 1
-      }
-    ]
+const DEFAULT_QUERY = 'redux';
+
+const PATH_BASE = "https://hn.algolia.com/api/v1";
+const PATH_SEARCH = '/search';
+const PARAM_SEARCH = '?query=';
+
+const URL = `${PATH_BASE}${PATH_SEARCH}${PARAM_SEARCH}`;
 
 const isSearched = (searchTerm) => (item) =>
-  !searchTerm || item.title.toLowerCase().includes(searchTerm.toLowerCase());
+!searchTerm || item.title.toLowerCase().includes(searchTerm.toLowerCase());
 
 class App extends Component {
 
@@ -29,20 +18,39 @@ class App extends Component {
     super(props);
 
     this.state = {
-      list: list,
-      searchTerm: '',
+      result: null,
+      searchTerm: DEFAULT_QUERY,
     };
 
+    this.setSearchTopStories = this.setSearchTopStories.bind(this);
+    this.fetchSearchTopStories = this.fetchSearchTopStories.bind(this);
     this.onDismiss = this.onDismiss.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
+  }
+
+  setSearchTopStories(result) {
+    this.setState({ result });
+  }
+
+  fetchSearchTopStories(searchTerm) {
+    fetch(`${URL}${searchTerm}`)
+      .then(response => response.json())
+      .then(result => this.setSearchTopStories(result));
+  }
+
+  componentDidMount() {
+    const { searchTerm } = this.state;
+    this.fetchSearchTopStories(searchTerm);
   }
 
   onDismiss(clickedObjectID) {
     
     const isNotId = item => item.objectID !== clickedObjectID;
-    const updatedList = this.state.list.filter(isNotId);
+    const updatedHits = this.state.result.hits.filter(isNotId);
 
-    this.setState({list: updatedList});
+    this.setState({
+      result: Object.assign({}, this.state.result, {hits: updatedHits })      
+    });
   }
 
   onSearchChange(event) {
@@ -51,19 +59,26 @@ class App extends Component {
 
   render() {
 
-    const { searchTerm, list } = this.state;
+    const { searchTerm, result } = this.state;
+
+    if (!result) {
+      return null;
+    }
 
     return (
-      <div className="App">
-        <Search 
+      <div className="page">
+
+        <div className="interactions">
+          <Search 
           value={searchTerm}
           onChange={this.onSearchChange}
-        >
-          Search
-        </Search>
+          >
+            Search
+          </Search>
+        </div>
 
         <Table
-          list={list}
+          list={result.hits}
           pattern={searchTerm}
           onDismiss={this.onDismiss}
         />
@@ -72,68 +87,67 @@ class App extends Component {
   }
 }
 
-class Button extends Component {
-  render() {
-    const {
-      onClick,
-      className = '',
-      children,
-    } = this.props;
+const Button = ({onClick, className = '', children}) =>
+  <button
+    onClick={onClick}
+    className={className}
+    type="button"
+  >
+    {children}
+  </button>
 
-    return(
-      <button
-        onClick={onClick}
-        className={className}
-        type="button"
-      >
-      {children}
-      </button>
-    );
-  }
-}
+const Search = ({value, onChange, children}) =>
+<form>
+  {children} <input 
+    type="text" 
+    value={value}
+    onChange={onChange}
+  />
+</form>
 
-class Search extends Component {
-  render() {
 
-    const { value, onChange, children } = this.props;
+const Table = ({ list, pattern, onDismiss }) => {
+  const largeColumn = {
+    width: '40%',
+  };
 
-    return (
-      <form>
-        {children} <input 
-          type="text" 
-          value={value}
-          onChange={onChange}
-        />
-      </form>
-    );
-  }
-}
+  const midColumn = {
+    width: '30%',
+  };
 
-class Table extends Component {
-  render() {
+  const smallColumn = {
+    width: '10%',
+  };
 
-    const { list, pattern, onDismiss } = this.props;
+  return (
+    <div>
+      { list.filter(isSearched(pattern)).map(item => 
+      <div key={item.objectID} className="table-row">
+        <span style={largeColumn}>
+          <a href={item.url}> {item.title}</a>
+        </span>
 
-    return (
-      <div>
-        { list.filter(isSearched(pattern)).map(item => 
-        <div key={item.objectID}>
-          <span>
-            <a href={item.url}> {item.title}</a>
-          </span>
-          <span>{item.author}</span>
-          <span>{item.num_comments}</span>
-          <span>{item.points}</span>
-          <span>
-            <Button onClick={() => onDismiss(item.objectID)}>
-              Dismiss
-            </Button>
-          </span>
-        </div>
-      )}
+        <span style={midColumn}>
+          {item.author}
+        </span>
+        <span style={smallColumn}>
+          {item.num_comments}
+        </span>
+        <span style={smallColumn}>
+          {item.points}
+        </span>
+        <span style={smallColumn}>
+          <Button 
+            onClick={() => onDismiss(item.objectID)}
+            className = "button-inline"
+          >
+            Dismiss
+          </Button>
+        </span>
       </div>
-    );
-  }
+      )}
+    </div>
+  );
 }
 
 export default App;
