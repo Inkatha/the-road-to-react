@@ -1,15 +1,25 @@
 import React, { Component } from 'react';
-import './App.css';
+import './index.css';
 
-const DEFAULT_QUERY = 'redux';
-const DEFAULT_PAGE = 0;
-const DEFAULT_HPP = 25;
 
-const PATH_BASE = "https://hn.algolia.com/api/v1";
-const PATH_SEARCH = '/search';
-const PARAM_SEARCH = 'query=';
-const PARAM_PAGE = 'page=';
-const PARAM_HPP = 'hitsPerPage=';
+import {
+  DEFAULT_QUERY,
+  DEFAULT_PAGE,
+  DEFAULT_HPP,
+  PATH_BASE,
+  PATH_SEARCH,
+  PARAM_SEARCH,
+  PARAM_PAGE,
+  PARAM_HPP
+} from '../../constants';
+
+import {
+  Button,
+} from '../Buttons';
+
+import Table from '../Table';
+
+import Search from '../Search';
 
 class App extends Component {
 
@@ -141,80 +151,6 @@ class App extends Component {
       </div>
     );
   }
-}
-
-const Button = ({onClick, className = '', children}) =>
-  <button
-    onClick={onClick}
-    className={className}
-    type="button"
-  >
-    {children}
-  </button>
-
-const Search = ({
-  value, 
-  onChange, 
-  onSubmit,
-  children
-}) =>
-  <form onSubmit={onSubmit}>
-    <input 
-      type="text" 
-      value={value}
-      onChange={onChange}
-    />
-    <button type="submit">
-      {children}
-    </button>
-  </form>
-
-
-const Table = ({ 
-  list, 
-  onDismiss 
-}) => {
-  const largeColumn = {
-    width: '40%',
-  };
-
-  const midColumn = {
-    width: '30%',
-  };
-
-  const smallColumn = {
-    width: '10%',
-  };
-
-  return (
-    <div>
-      { list.map(item => 
-      <div key={item.objectID} className="table-row">
-        <span style={largeColumn}>
-          <a href={item.url}> {item.title}</a>
-        </span>
-
-        <span style={midColumn}>
-          {item.author}
-        </span>
-        <span style={smallColumn}>
-          {item.num_comments}
-        </span>
-        <span style={smallColumn}>
-          {item.points}
-        </span>
-        <span style={smallColumn}>
-          <Button 
-            onClick={() => onDismiss(item.objectID)}
-            className = "button-inline"
-          >
-            Dismiss
-          </Button>
-        </span>
-      </div>
-      )}
-    </div>
-  );
 }
 
 export default App;
