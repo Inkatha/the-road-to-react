@@ -36,3 +36,13 @@ exports[`App snapshots 1`] = `
   </div>
 </div>
 `;
+
+exports[`Button snapshots 1`] = `
+<button
+  className=""
+  onClick={undefined}
+  type="button"
+>
+  Give Me More
+</button>
+`;

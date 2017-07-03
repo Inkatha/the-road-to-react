@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Renderer from 'react-test-renderer';
-import App from './App';
+import renderer from 'react-test-renderer';
+import App, { Search, Button } from './App';
 
 describe('App', () =>  {
   
@@ -11,12 +11,28 @@ describe('App', () =>  {
   });
 
   test('snapshots', () => {
-    const component = Renderer.create(
+    const component = renderer.create(
       <App />
     );
     let tree = component.toJSON();
     expect(tree).toMatchSnapshot();
   });
 
+});
+
+describe('Button', () => {
+  
+  it('renders', () => {
+    const div = document.createElement('div');
+    ReactDOM.render(<Button>Give Me More</Button>, div);
+  });
+
+  test('snapshots', () => {
+    const component = renderer.create(
+      <Button>Give Me More</Button>
+    );
+    let tree = component.toJSON();
+    expect(tree).toMatchSnapshot();
+  })
 });
 

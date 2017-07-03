@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
 import './index.css';
 
+import {
+  Button,
+} from '../Buttons';
+
+import Table from '../Table';
+
+import Search from '../Search';
 
 import {
   DEFAULT_QUERY,
@@ -13,13 +20,7 @@ import {
   PARAM_HPP
 } from '../../constants';
 
-import {
-  Button,
-} from '../Buttons';
 
-import Table from '../Table';
-
-import Search from '../Search';
 
 class App extends Component {
 
@@ -30,6 +31,7 @@ class App extends Component {
       results: null,
       searchKey: '',
       searchTerm: DEFAULT_QUERY,
+      isLoading: false,
     };
 
     this.needsToSearchTopStories = this.needsToSearchTopStories.bind(this);
@@ -61,11 +63,14 @@ class App extends Component {
       results: {
         ...results, 
         [searchKey]: { hits: updatedHits, page }
-      }
+      },
+      isLoading: false,
     });
   }
 
   fetchSearchTopStories(searchTerm, pageNumber) {
+    this.setState({ isLoading: true });
+
     const url = `${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${pageNumber}&${PARAM_HPP}${DEFAULT_HPP}`;
     fetch(url)
       .then(response => response.json())
@@ -77,6 +82,8 @@ class App extends Component {
     this.setState({ searchKey: searchTerm })
     this.fetchSearchTopStories(searchTerm, DEFAULT_PAGE);
   }
+
+
 
   onDismiss(id) {
 
@@ -113,7 +120,10 @@ class App extends Component {
     const { 
       searchTerm, 
       results,
-      searchKey
+      searchKey,
+      isLoading,
+      sortKey,
+      isSortReverse,
     } = this.state;
 
     const page = (
@@ -144,14 +154,32 @@ class App extends Component {
           onDismiss={this.onDismiss}
         />
         <div className="interactions">
-          <Button onClick={() => this.fetchSearchTopStories(searchTerm, page + 1)}>
-            More
-          </Button>
+          <ButtonWithLoading
+            isLoading={isLoading}
+            onClick={() => this.fetchSearchTopStories(searchTerm, page + 1)}>
+              More
+          </ButtonWithLoading>
         </div>
       </div>
     );
   }
 }
+
+
+const Loading = () => 
+  <div>
+    <i className="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+    <span class="sr-only">Loading...</span>
+  </div>
+
+
+const withLoading = (Component) => ({ isLoading, ...rest }) => 
+  isLoading ? <Loading /> : <Component { ...rest } />
+
+
+const ButtonWithLoading = withLoading(Button);
+
+
 
 export default App;
 
