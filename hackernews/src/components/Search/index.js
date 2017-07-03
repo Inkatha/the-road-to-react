@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 class Search extends Component {
     render() {
@@ -19,5 +20,13 @@ class Search extends Component {
         );
     }
 }
+
+Search.propTypes = {
+    value: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    children: PropTypes.string.isRequired
+}
+
 
 export default Search;
