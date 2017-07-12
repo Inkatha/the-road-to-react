@@ -20,7 +20,26 @@ import {
   PARAM_HPP
 } from '../../constants';
 
+const updateSearchTopstoriesState = (hits, page) => (prevState) => {
+  const { searchKey, results } = prevState;
 
+  const oldHits = results && results[searchKey]
+    ? results[searchKey].hits
+    : [];
+  
+  const updatedHits = [
+    ...oldHits,
+    ...hits
+  ];
+
+  return {
+    results: {
+      ...results, 
+      [searchKey]: { hits: updatedHits, page }
+    },
+      isLoading: false,
+  }
+}
 
 class App extends Component {
 
@@ -48,25 +67,12 @@ class App extends Component {
 
   setSearchTopStories(result) {
     const { hits, page } = result;
-    const { searchKey, results } = this.state;
+    this.setState(updateSearchTopstoriesState(hits, page))
 
-    const oldHits = results && results[searchKey]
-      ? results[searchKey].hits
-      : [];
     
-    const updatedHits = [
-      ...oldHits,
-      ...hits
-    ];
-
-    this.setState({ 
-      results: {
-        ...results, 
-        [searchKey]: { hits: updatedHits, page }
-      },
-      isLoading: false,
-    });
   }
+
+ 
 
   fetchSearchTopStories(searchTerm, pageNumber) {
     this.setState({ isLoading: true });
@@ -122,8 +128,6 @@ class App extends Component {
       results,
       searchKey,
       isLoading,
-      sortKey,
-      isSortReverse,
     } = this.state;
 
     const page = (
